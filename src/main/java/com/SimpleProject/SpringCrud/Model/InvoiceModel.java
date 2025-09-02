@@ -1,5 +1,7 @@
 package com.SimpleProject.SpringCrud.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -13,12 +15,16 @@ public class InvoiceModel {
     private Long invoiceId;
     private LocalDate invoiceDate;
     private Double totalAmount;
+    private double discount;
+    private boolean isPercentage;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonBackReference("customer-invoice")
     private CustomerModel customer;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "invoice")
+    @JsonManagedReference("invoice-invoiceItem")
     private List<InvoiceItemModel> invoiceItems;
 
     public Long getInvoiceId() {
@@ -33,8 +39,8 @@ public class InvoiceModel {
         return invoiceDate;
     }
 
-    public void setInvoiceDate(LocalDate invoiceDate) {
-        this.invoiceDate = invoiceDate;
+    public void setInvoiceDate(LocalDate date) {
+        this.invoiceDate = LocalDate.now();
     }
 
     public Double getTotalAmount() {
@@ -59,5 +65,21 @@ public class InvoiceModel {
 
     public void setInvoiceItems(List<InvoiceItemModel> invoiceItems) {
         this.invoiceItems = invoiceItems;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public boolean isPercentage() {
+        return isPercentage;
+    }
+
+    public void setPercentage(boolean percentage) {
+        isPercentage = percentage;
     }
 }

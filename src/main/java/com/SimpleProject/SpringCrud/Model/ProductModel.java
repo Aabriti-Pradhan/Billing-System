@@ -1,5 +1,6 @@
 package com.SimpleProject.SpringCrud.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class ProductModel {
     private Double price;
     private Integer stockQuantity;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product")
+    @JsonManagedReference("product-invoiceItem")
     private List<InvoiceItemModel> invoiceItems;
 
     public Long getProductId() {

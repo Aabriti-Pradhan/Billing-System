@@ -1,5 +1,6 @@
 package com.SimpleProject.SpringCrud.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,11 +14,13 @@ public class InvoiceItemModel {
     private Double subtotal;
 
     @ManyToOne
-    @JoinColumn(name = "invoice_id", nullable = false)
+    @JoinColumn(name = "invoice_id", nullable = true)
+    @JsonBackReference("invoice-invoiceItem")
     private InvoiceModel invoice;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonBackReference("product-invoiceItem")
     private ProductModel product;
 
     public Long getItemId() {

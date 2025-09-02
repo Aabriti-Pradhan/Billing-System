@@ -1,6 +1,7 @@
 package com.SimpleProject.SpringCrud.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -18,7 +19,8 @@ public class CustomerModel {
     private String phone;
     private String address;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer")
+    @JsonManagedReference("customer-invoice")
     private List<InvoiceModel> invoices;
 
 
