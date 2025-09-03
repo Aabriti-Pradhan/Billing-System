@@ -23,7 +23,7 @@ public class InvoiceModel {
     @JsonBackReference("customer-invoice")
     private CustomerModel customer;
 
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("invoice-invoiceItem")
     private List<InvoiceItemModel> invoiceItems;
 

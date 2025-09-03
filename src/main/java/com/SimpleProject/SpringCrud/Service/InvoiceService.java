@@ -73,6 +73,11 @@ public class InvoiceService {
     }
 
     public InvoiceModel getInvoiceById(Long id) {
+
         return invoiceRepository.findById(id).orElse(null);
+    }
+
+    public void deleteInvoice(Long id) {
+        invoiceRepository.deleteById(id);
     }
 }
