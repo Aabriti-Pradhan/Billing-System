@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,8 +14,9 @@ public class InvoiceModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long invoiceId;
+
     private LocalDate invoiceDate;
-    private Double totalAmount;
+    private Double totalAmount = 0.0;
     private double discount;
     private boolean isPercentage;
 
@@ -25,61 +27,33 @@ public class InvoiceModel {
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("invoice-invoiceItem")
-    private List<InvoiceItemModel> invoiceItems;
+    private List<InvoiceItemModel> invoiceItems = new ArrayList<>();
 
-    public Long getInvoiceId() {
-        return invoiceId;
-    }
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvoiceServiceModel> invoiceServices = new ArrayList<>();
 
-    public void setInvoiceId(Long invoiceId) {
-        this.invoiceId = invoiceId;
-    }
+    // Getters and Setters
+    public Long getInvoiceId() { return invoiceId; }
+    public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
 
-    public LocalDate getInvoiceDate() {
-        return invoiceDate;
-    }
+    public LocalDate getInvoiceDate() { return invoiceDate; }
+    public void setInvoiceDate(LocalDate invoiceDate) { this.invoiceDate = invoiceDate; }
 
-    public void setInvoiceDate(LocalDate date) {
-        this.invoiceDate = LocalDate.now();
-    }
+    public Double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
 
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
+    public CustomerModel getCustomer() { return customer; }
+    public void setCustomer(CustomerModel customer) { this.customer = customer; }
 
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
+    public List<InvoiceItemModel> getInvoiceItems() { return invoiceItems; }
+    public void setInvoiceItems(List<InvoiceItemModel> invoiceItems) { this.invoiceItems = invoiceItems; }
 
-    public CustomerModel getCustomer() {
-        return customer;
-    }
+    public double getDiscount() { return discount; }
+    public void setDiscount(double discount) { this.discount = discount; }
 
-    public void setCustomer(CustomerModel customer) {
-        this.customer = customer;
-    }
+    public boolean isPercentage() { return isPercentage; }
+    public void setPercentage(boolean percentage) { isPercentage = percentage; }
 
-    public List<InvoiceItemModel> getInvoiceItems() {
-        return invoiceItems;
-    }
-
-    public void setInvoiceItems(List<InvoiceItemModel> invoiceItems) {
-        this.invoiceItems = invoiceItems;
-    }
-
-    public double getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
-
-    public boolean isPercentage() {
-        return isPercentage;
-    }
-
-    public void setPercentage(boolean percentage) {
-        isPercentage = percentage;
-    }
+    public List<InvoiceServiceModel> getInvoiceServices() { return invoiceServices; }
+    public void setInvoiceServices(List<InvoiceServiceModel> invoiceServices) { this.invoiceServices = invoiceServices; }
 }

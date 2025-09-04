@@ -41,4 +41,9 @@ public class CustomerService {
         customerRepository.deleteById(id);
 
     }
+
+    public CustomerModel readCustomerById(Long id) {
+        return customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+    }
 }

@@ -77,5 +77,8 @@
 <form action="/invoice" method="get">
     <button type="submit">Invoices</button>
 </form>
+<form action="/service" method="get">
+    <button type="submit">Services</button>
+</form>
 </body>
 </html>
