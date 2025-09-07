@@ -15,7 +15,7 @@
 
             .content {
                 padding: 15px 180px;
-                margin-top: -140px;
+                margin-top: -250px;
             }
 
             h1 {
@@ -93,7 +93,7 @@
 </form>
 
 <div style="text-align:center;">
-        <a href="/customer" class="back-link">Back to Customers Page</a>
+        <a href="/customer" class="back-link">Back to Customers List</a>
     </div>
 </div>
 </body>

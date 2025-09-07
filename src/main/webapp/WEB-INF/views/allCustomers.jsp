@@ -14,7 +14,7 @@
 
         .content {
             padding: 15px 180px;
-            margin-top: -140px;
+            margin-top: -250px;
         }
 
         h1 {
@@ -69,13 +69,41 @@
         .back-link:hover {
             background-color: #FFF0CE;
         }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 25px;
+        }
+
+        .add-button {
+            background-color: #A8BBA3;
+            color: #2F3E2F;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .add-button:hover {
+            background-color: #FFF0CE;
+        }
     </style>
 </head>
 <body>
     <jsp:include page="home.jsp"/>
 
     <div class="content">
-        <h1>Customer List</h1>
+        <div class="header">
+            <h1>Customers List</h1>
+            <a href="/addCustomers" class="add-button">+</a>
+        </div>
 
         <table>
             <thead>
@@ -85,6 +113,7 @@
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Address</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,14 +124,23 @@
                         <td>${cust.email}</td>
                         <td>${cust.phone}</td>
                         <td>${cust.address}</td>
+                        <td>
+                            <form action="/updateCustomer/${cust.customerId}" method="get" style="display:inline;">
+                                <button type="submit" class="action-btn delete-btn">
+                                    Update
+                                </button>
+                            </form>
+                            <form action="/api/delete/${cust.customerId}" method="post" style="display:inline;">
+                                <button type="submit" class="action-btn delete-btn"
+                                    onclick="return confirm('Are you sure you want to delete this Customer?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 </c:forEach>
             </tbody>
         </table>
-
-        <div style="text-align:center;">
-            <a href="/customer" class="back-link">Back to Customer Page</a>
-        </div>
     </div>
 </body>
 </html>

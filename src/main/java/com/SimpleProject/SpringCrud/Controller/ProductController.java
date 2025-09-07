@@ -20,7 +20,6 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("/createP")
-    @ResponseBody
     public String createProduct(@RequestParam("name") String name,
                               @RequestParam("description") String description,
                               @RequestParam("price") double price,
@@ -33,7 +32,7 @@ public class ProductController {
 
         productService.addProduct(product);
 
-        return "Product created";
+        return "redirect:/api/readP";
 
     }
 
@@ -46,7 +45,6 @@ public class ProductController {
 
 
     @PostMapping("/updateP")
-    @ResponseBody
     public String updateProductFromForm(
             @RequestParam("id") Long id,
             @RequestParam("name") String name,
@@ -62,13 +60,12 @@ public class ProductController {
 
         productService.updateProduct(id, product);
 
-        return "updated successfully";
+        return "redirect:/api/readP";
     }
 
     @PostMapping("/deleteP/{id}")
-    @ResponseBody
     public String deleteProduct(@PathVariable long id) {
         productService.deleteProduct(id);
-        return "Product with id  "+id +"  Deleted";
+        return "redirect:/api/readP";
     }
 }

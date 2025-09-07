@@ -14,7 +14,7 @@
 
         .content {
             padding: 15px 180px;
-            margin-top: -140px;
+            margin-top: -210px;
         }
 
         .header {
@@ -161,10 +161,6 @@
             </c:forEach>
         </tbody>
     </table>
-
-    <div style="text-align:center;">
-        <a href="/invoice" class="back-link">Back to Invoices Page</a>
-    </div>
 </div>
 </body>
 </html>

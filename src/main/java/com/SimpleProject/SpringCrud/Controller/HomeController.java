@@ -1,9 +1,12 @@
 package com.SimpleProject.SpringCrud.Controller;
 
+import com.SimpleProject.SpringCrud.Model.CustomerModel;
 import com.SimpleProject.SpringCrud.Model.InvoiceModel;
+import com.SimpleProject.SpringCrud.Model.ProductModel;
 import com.SimpleProject.SpringCrud.Service.CustomerService;
 import com.SimpleProject.SpringCrud.Service.InvoiceService;
 import com.SimpleProject.SpringCrud.Service.ProductService;
+import com.SimpleProject.SpringCrud.Service.ServiceInvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,9 @@ public class HomeController {
     @Autowired
     private InvoiceService invoiceService;
 
+    @Autowired
+    private ServiceInvoiceService serviceInvoiceService;
+
     @GetMapping("/")
     public String home() {
         return "home"; //will automatically detect home.jsp
@@ -31,17 +37,17 @@ public class HomeController {
 
     @GetMapping("/customer")
     public String customerPage() {
-        return "customer";
+        return "redirect:/api/read";
     }
 
     @GetMapping("/product")
     public String productPage() {
-        return "product";
+        return "redirect:/api/readP";
     }
 
     @GetMapping("/invoice")
     public String invoicePage() {
-        return "invoice";
+        return "redirect:/api/allInvoice";
     }
 
     @GetMapping("/addCustomers")
@@ -54,13 +60,17 @@ public class HomeController {
         return "addProducts";
     }
 
-    @GetMapping("/updateCustomers")
-    public String updateCustomersPage() {
+    @GetMapping("/updateCustomer/{id}")
+    public String showUpdateCustomer(@PathVariable Long id, Model model) {
+        CustomerModel customer = customerService.readCustomerById(id);
+        model.addAttribute("customer", customer);
         return "updateCustomers";
     }
 
-    @GetMapping("/updateProducts")
-    public String updateProductsPage() {
+    @GetMapping("/updateProduct/{id}")
+    public String showUpdateProducts(@PathVariable Long id, Model model) {
+        ProductModel product = productService.readProductById(id);
+        model.addAttribute("product", product);
         return "updateProducts";
     }
 
@@ -82,8 +92,9 @@ public class HomeController {
 
     @GetMapping("/addInvoice")
     public String showAddInvoicePage(Model model) {
-        model.addAttribute("customers", customerService.readAllCustomer());
-        model.addAttribute("products", productService.readAllProduct());
+        model.addAttribute("customers", customerService.getAllCustomers());
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("services", serviceInvoiceService.getAllServices());
         return "addInvoice";
     }
 

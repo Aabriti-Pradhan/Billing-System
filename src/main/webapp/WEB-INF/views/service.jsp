@@ -32,6 +32,9 @@
             </c:forEach>
         </select>
 
+        <label>Invoice Date:</label>
+        <input type="date" name="invoiceDate" value="<%= java.time.LocalDate.now() %>" required>
+
         <table id="serviceTable">
             <thead>
                 <tr>
@@ -49,10 +52,9 @@
             </tbody>
         </table>
 
-        <button type="button" onclick="addServiceRow()">+ Add Service</button>
-        <button type="submit">Save</button>
+        <button type="button" class="add-btn" onclick="addServiceRow()">+ Add Service</button>
+        <button type="submit">Save Invoice</button>
     </form>
-
 </div>
 
 <script>
@@ -66,6 +68,6 @@
         `;
         tbody.appendChild(newRow);
     }
-    </script>
+</script>
 </body>
 </html>

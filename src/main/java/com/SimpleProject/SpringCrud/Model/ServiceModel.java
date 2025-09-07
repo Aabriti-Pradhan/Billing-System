@@ -1,5 +1,6 @@
 package com.SimpleProject.SpringCrud.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,31 +12,60 @@ public class ServiceModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long service_id;
+    private Long serviceId;
 
     private String serviceName;
-    private double baseAmount; // optional
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private CustomerModel customer;
+    @Column(nullable = false)
+    private Double amount;
 
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InvoiceServiceModel> invoiceServiceItems = new ArrayList<>();
+    private Double baseAmount; // optional
 
-    // Getters and Setters
-    public Long getId() { return service_id; }
-    public void setId(Long id) { this.service_id = id; }
+    @OneToMany(mappedBy = "service")
+    @JsonManagedReference("service-invoice-items")
+    private List<ServiceInvoiceItemModel> serviceInvoiceItems;
 
-    public String getServiceName() { return serviceName; }
-    public void setServiceName(String serviceName) { this.serviceName = serviceName; }
+    public Long getServiceId() {
+        return serviceId;
+    }
 
-    public double getBaseAmount() { return baseAmount; }
-    public void setBaseAmount(double baseAmount) { this.baseAmount = baseAmount; }
+    public void setServiceId(Long serviceId) {
+        this.serviceId = serviceId;
+    }
 
-    public CustomerModel getCustomer() { return customer; }
-    public void setCustomer(CustomerModel customer) { this.customer = customer; }
+    public String getServiceName() {
+        return serviceName;
+    }
 
-    public List<InvoiceServiceModel> getInvoiceServiceItems() { return invoiceServiceItems; }
-    public void setInvoiceServiceItems(List<InvoiceServiceModel> invoiceServiceItems) { this.invoiceServiceItems = invoiceServiceItems; }
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public double getBaseAmount() {
+        return baseAmount;
+    }
+
+    public void setBaseAmount(double baseAmount) {
+        this.baseAmount = baseAmount;
+    }
+
+    public List<ServiceInvoiceItemModel> getServiceInvoiceItems() {
+        return serviceInvoiceItems;
+    }
+
+    public void setServiceInvoiceItems(List<ServiceInvoiceItemModel> serviceInvoiceItems) {
+        this.serviceInvoiceItems = serviceInvoiceItems;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public void setBaseAmount(Double baseAmount) {
+        this.baseAmount = baseAmount;
+    }
 }

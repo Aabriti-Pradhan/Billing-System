@@ -29,7 +29,7 @@ public class CustomerService {
         CustomerModel customer = customerRepository.findById(id).orElse(null);
         if (customer != null) {
             customer.setName(customerEntity.getName());
-            customer.setAddress(customerEntity.getEmail());
+            customer.setEmail(customerEntity.getEmail());
             customer.setAddress(customerEntity.getAddress());
             return customerRepository.save(customer);
         }
@@ -45,5 +45,9 @@ public class CustomerService {
     public CustomerModel readCustomerById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+    }
+
+    public List<CustomerModel> getAllCustomers() {
+        return customerRepository.findAll();
     }
 }

@@ -86,16 +86,16 @@
     <h1>Update Customer</h1>
 
     <form class="update-form" action="/api/update" method="post">
-        <input type="number" name="id" placeholder="Customer ID" required />
-        <input type="text" name="name" placeholder="New Name" required />
-        <input type="text" name="email" placeholder="New Email" required />
-        <input type="text" name="phone" placeholder="New Phone" required />
-        <input type="text" name="address" placeholder="New Address" required />
+        <input type="hidden" name="id" value="${customer.customerId}" />
+
+        <input type="text" name="name" placeholder="Name" value="${customer.name}" required />
+        <input type="email" name="email" placeholder="Email" value="${customer.email}" required />
+        <input type="text" name="phone" placeholder="Phone" value="${customer.phone}" required />
+        <input type="text" name="address" placeholder="Address" value="${customer.address}" required />
+
         <button type="submit">Update Customer</button>
-
-
-    <a href="/customer" class="back-link">Back to Customer Page</a>
     </form>
+
 </div>
 </body>
 </html>

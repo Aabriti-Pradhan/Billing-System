@@ -29,9 +29,6 @@ public class InvoiceModel {
     @JsonManagedReference("invoice-invoiceItem")
     private List<InvoiceItemModel> invoiceItems = new ArrayList<>();
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InvoiceServiceModel> invoiceServices = new ArrayList<>();
-
     // Getters and Setters
     public Long getInvoiceId() { return invoiceId; }
     public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
@@ -54,6 +51,4 @@ public class InvoiceModel {
     public boolean isPercentage() { return isPercentage; }
     public void setPercentage(boolean percentage) { isPercentage = percentage; }
 
-    public List<InvoiceServiceModel> getInvoiceServices() { return invoiceServices; }
-    public void setInvoiceServices(List<InvoiceServiceModel> invoiceServices) { this.invoiceServices = invoiceServices; }
 }

@@ -15,7 +15,7 @@
 
         .content {
             padding: 15px 180px;
-            margin-top: -140px;
+            margin-top: -210px;
         }
 
         h1 {

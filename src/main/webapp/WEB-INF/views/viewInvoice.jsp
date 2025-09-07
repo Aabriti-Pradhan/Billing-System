@@ -88,6 +88,11 @@
         </tbody>
     </table>
 
+    <form action="${pageContext.request.contextPath}/invoices/pdf/${invoice.invoiceId}">
+        <button>Download Invoice</button>
+    </form>
+
+
     <div style="text-align:center;">
         <a href="/api/allInvoice" class="back-link">Back to All Invoices</a>
     </div>

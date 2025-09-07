@@ -18,7 +18,6 @@ public class CustomerController {
     private CustomerService customerService;
 
     @PostMapping("/create")
-    @ResponseBody
     public String createCustomer(@RequestParam("name") String name,
                                  @RequestParam("email") String email,
                                  @RequestParam("phone") String phone,
@@ -32,7 +31,7 @@ public class CustomerController {
 
         customerService.addCustomer(customer);
 
-        return "User Created";
+        return "redirect:/api/read";
     }
 
     @GetMapping("/read")
@@ -44,7 +43,6 @@ public class CustomerController {
 
 
     @PostMapping("/update")
-    @ResponseBody
     public String updateCustomer(@RequestParam Long id,
                                  @RequestParam String name,
                                  @RequestParam String email,
@@ -56,14 +54,13 @@ public class CustomerController {
         customer.setPhone(phone);
         customer.setAddress(address);
         customerService.updateCutomer(id, customer);
-        return "updated successfully";
+        return "redirect:/api/read";
     }
 
 
     @PostMapping("/delete/{id}")
-    @ResponseBody
     public String deleteCustomer(@PathVariable long id) {
         customerService.deleteCustomer(id);
-        return "Customer with id  "+id +"  Deleted";
+        return "redirect:/api/read";
     }
 }

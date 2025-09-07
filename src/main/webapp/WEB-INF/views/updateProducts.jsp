@@ -86,15 +86,14 @@
     <h1>Update Product</h1>
 
     <form class="update-form" action="/api/updateP" method="post">
-        <input type="number" name="id" placeholder="Product ID" required />
-        <input type="text" name="name" placeholder="New Name" required />
-        <input type="text" name="description" placeholder="New Description" required />
-        <input type="text" name="price" placeholder="New Price" required />
-        <input type="text" name="stockQuantity" placeholder="New Stock Quantity" required />
+        <input type="hidden" name="id" value="${product.productId}" />
+
+        <input type="text" name="name" placeholder="Name" value="${product.name}" required />
+        <input type="text" name="description" placeholder="Description" value="${product.description}" required />
+        <input type="number" name="price" placeholder="Price" value="${product.price}" required />
+        <input type="number" name="stockQuantity" placeholder="Stock Quantity" value="${product.stockQuantity}" required step="0.01" />
+
         <button type="submit">Update Product</button>
-
-
-    <a href="/product" class="back-link">Back to products Page</a>
     </form>
 </div>
 </body>

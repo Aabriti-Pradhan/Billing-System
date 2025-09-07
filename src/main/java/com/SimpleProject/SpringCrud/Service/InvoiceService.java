@@ -143,4 +143,14 @@ public class InvoiceService {
 
         invoiceRepository.delete(invoice);
     }
+
+    public List<InvoiceModel> getAllCustomers() {
+        return invoiceRepository.findAll();
+    }
+
+    public InvoiceModel getLatestInvoice() {
+        return invoiceRepository.findTopByOrderByInvoiceDateDesc()
+                .orElse(null);
+    }
+
 }

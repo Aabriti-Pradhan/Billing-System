@@ -23,6 +23,10 @@ public class CustomerModel {
     @JsonManagedReference("customer-invoice")
     private List<InvoiceModel> invoices;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonManagedReference("customer-service-invoice")
+    private List<ServiceInvoiceModel> serviceInvoices;
+
 
     public Long getCustomerId() {
         return customerId;
@@ -62,5 +66,21 @@ public class CustomerModel {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<InvoiceModel> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<InvoiceModel> invoices) {
+        this.invoices = invoices;
+    }
+
+    public List<ServiceInvoiceModel> getServiceInvoices() {
+        return serviceInvoices;
+    }
+
+    public void setServiceInvoices(List<ServiceInvoiceModel> serviceInvoices) {
+        this.serviceInvoices = serviceInvoices;
     }
 }
