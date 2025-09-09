@@ -3,10 +3,13 @@ package com.SimpleProject.SpringCrud.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+@Data
 
 @Entity
 public class InvoiceModel {
@@ -25,30 +28,12 @@ public class InvoiceModel {
     @JsonBackReference("customer-invoice")
     private CustomerModel customer;
 
+    @ManyToOne
+    @JoinColumn(name = "main_invoice_id")
+    @JsonBackReference("mainInvoice-productInvoices")
+    private MainInvoiceModel mainInvoice;
+
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("invoice-invoiceItem")
     private List<InvoiceItemModel> invoiceItems = new ArrayList<>();
-
-    // Getters and Setters
-    public Long getInvoiceId() { return invoiceId; }
-    public void setInvoiceId(Long invoiceId) { this.invoiceId = invoiceId; }
-
-    public LocalDate getInvoiceDate() { return invoiceDate; }
-    public void setInvoiceDate(LocalDate invoiceDate) { this.invoiceDate = invoiceDate; }
-
-    public Double getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
-
-    public CustomerModel getCustomer() { return customer; }
-    public void setCustomer(CustomerModel customer) { this.customer = customer; }
-
-    public List<InvoiceItemModel> getInvoiceItems() { return invoiceItems; }
-    public void setInvoiceItems(List<InvoiceItemModel> invoiceItems) { this.invoiceItems = invoiceItems; }
-
-    public double getDiscount() { return discount; }
-    public void setDiscount(double discount) { this.discount = discount; }
-
-    public boolean isPercentage() { return isPercentage; }
-    public void setPercentage(boolean percentage) { isPercentage = percentage; }
-
 }

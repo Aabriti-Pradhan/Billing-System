@@ -4,6 +4,8 @@
 <html>
 <head>
     <title>All Invoices</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -30,7 +32,6 @@
         }
 
         .add-button {
-            background-color: #A8BBA3;
             color: #2F3E2F;
             font-weight: bold;
             border: none;
@@ -118,6 +119,21 @@
         .delete-btn:hover {
             background-color: #E63946;
         }
+
+        /* Progress bar animation for toast */
+        .toast .progress-bar {
+            animation: shrink 3s linear forwards;
+        }
+
+        @keyframes shrink {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -126,7 +142,7 @@
 <div class="content">
     <div class="header">
         <h1>Invoices List</h1>
-        <a href="/addInvoice" class="add-button">Add Invoice</a>
+        <a href="/addInvoice" class="add-button"><i class="bi bi-file-plus-fill fs-1"></i></a>
     </div>
 
     <table>
@@ -140,9 +156,9 @@
             </tr>
         </thead>
         <tbody>
-            <c:forEach var="inv" items="${invoices}">
+            <c:forEach var="inv" items="${invoices}" varStatus="status">
                 <tr>
-                    <td>${inv.invoiceId}</td>
+                    <td>${status.index + 1}</td>
                     <td>${inv.invoiceDate}</td>
                     <td>${inv.totalAmount}</td>
                     <td>${inv.discount}</td>
@@ -150,10 +166,10 @@
                         <form action="/invoice/update/${inv.invoiceId}" method="get" style="display:inline;">
                             <a href="/api/invoice/view/${inv.invoiceId}" class="action-btn update-btn">View</a>
                         </form>
+                        <!--delete button-->
                         <form action="/invoice/delete/${inv.invoiceId}" method="post" style="display:inline;">
-                            <button type="submit" class="action-btn delete-btn"
-                                    onclick="return confirm('Are you sure you want to delete this invoice?');">
-                                Delete
+                            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#exampleModal"  data-id="${inv.invoiceId}">
+                                <i class="bi bi-trash3-fill fs-3 text-dark"></i>
                             </button>
                         </form>
                     </td>
@@ -161,6 +177,72 @@
             </c:forEach>
         </tbody>
     </table>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Invoice</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this invoice?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <form id="deleteForm" action="" method="post">
+              <button type="submit" class="btn btn-primary" class="btn btn-primary" id="liveToastBtn">Delete Invoice</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast for deletion -->
+    <div id="deleteToast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto">Invoice System</strong>
+          <small>Just now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+          Invoice Deleted Successfully!
+          <div class="progress mt-2" style="height: 5px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </div>
+<script>
+
+const deleteForm = document.getElementById('deleteForm');
+const deleteButtons = document.querySelectorAll('.delete-btn');
+
+deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const invoiceId = this.getAttribute('data-id');
+        localStorage.setItem("Status", "deleted");
+        deleteForm.action = '/api/invoice/delete/' + invoiceId;
+    });
+});
+
+window.addEventListener("DOMContentLoaded", function () {
+    const status = localStorage.getItem("Status");
+    if (status === "deleted") {
+        const toastEl = document.querySelector('#deleteToast .toast');
+        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        toast.show();
+
+        // clear the flag so it doesn't show every reload
+        localStorage.removeItem("Status");
+    }
+});
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

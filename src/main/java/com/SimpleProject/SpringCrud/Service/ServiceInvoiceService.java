@@ -59,4 +59,12 @@ public class ServiceInvoiceService {
     public List<ServiceModel> getAllServices() {
         return serviceRepository.findAll();
     }
+
+    public void save(ServiceInvoiceModel serviceInvoice) {
+        serviceInvoiceRepository.save(serviceInvoice);
+    }
+
+    public ServiceModel getInvoiceById(Long id) {
+        return serviceRepository.findById(id).orElse(null);
+    }
 }

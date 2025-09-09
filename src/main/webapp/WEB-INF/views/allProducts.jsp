@@ -4,6 +4,7 @@
 <html>
 <head>
     <title>All Products</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/>
     <style>
                 body {
                     font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -79,14 +80,16 @@
                 }
 
                 .add-button {
-                    background-color: #A8BBA3;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     color: #2F3E2F;
                     font-weight: bold;
                     border: none;
-                    padding: 10px 20px;
+                    padding: 12px 24px;
                     border-radius: 8px;
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: 36px;
                     transition: 0.3s;
                     text-decoration: none;
                 }
@@ -94,6 +97,14 @@
                 .add-button:hover {
                     background-color: #FFF0CE;
                 }
+
+                .icon-btn {
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                }
+
             </style>
 </head>
 <body>
@@ -102,7 +113,7 @@
     <div class="content">
         <div class="header">
             <h1>Products List</h1>
-            <a href="/addProducts" class="add-button">Add Products</a>
+            <a href="/addProducts" class="add-button"><i class="bi bi-file-plus-fill fs-1"></i></a>
         </div>
 <table>
     <thead>
@@ -116,23 +127,25 @@
         </tr>
     </thead>
     <tbody>
-        <c:forEach var="prod" items="${products}">
+        <c:forEach var="prod" items="${products}" varStatus="status">
             <tr>
-                <td>${prod.productId}</td>
+                <td>${status.index + 1}</td>
                 <td>${prod.name}</td>
                 <td>${prod.description}</td>
                 <td>${prod.price}</td>
                 <td>${prod.stockQuantity}</td>
                 <td>
+                    <!--update button-->
                     <form action="/updateProduct/${prod.productId}" method="get" style="display:inline;">
-                        <button type="submit" class="action-btn delete-btn">
-                            Update
+                        <button type="submit" class="icon-btn">
+                            <i class="bi bi-pencil-square fs-3 text-dark"></i>
                         </button>
                     </form>
+                    <!--delete button-->
                     <form action="/api/deleteP/${prod.productId}" method="post" style="display:inline;">
-                        <button type="submit" class="action-btn delete-btn"
-                            onclick="return confirm('Are you sure you want to delete this Product?');">
-                           Delete
+                        <button type="submit"
+                            onclick="return confirm('Are you sure you want to delete this Product?');" class="icon-btn">
+                           <i class="bi bi-trash3-fill fs-3 text-dark"></i>
                         </button>
                     </form>
                 </td>

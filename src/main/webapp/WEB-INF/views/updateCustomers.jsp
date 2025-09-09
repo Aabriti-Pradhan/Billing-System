@@ -14,7 +14,7 @@
 
         .content {
             padding: 15px 180px;
-            margin-top: -180px;
+            margin-top: 250px;
         }
 
         h1 {
@@ -29,6 +29,7 @@
             align-items: center;
             gap: 15px;
             text-align: center;
+            margin-top: 250px;
         }
 
         .update-form input {
@@ -80,12 +81,10 @@
     </style>
 </head>
 <body>
-<jsp:include page="home.jsp"/>
 
 <div class="content">
-    <h1>Update Customer</h1>
 
-    <form class="update-form" action="/api/update" method="post">
+    <form class="update-form" action="/api/update" method="post" onsubmit="localStorage.setItem('StatusUpdate', 'updated');">
         <input type="hidden" name="id" value="${customer.customerId}" />
 
         <input type="text" name="name" placeholder="Name" value="${customer.name}" required />

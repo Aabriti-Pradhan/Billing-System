@@ -28,6 +28,7 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                padding-top: 250px;
             }
 
             .add-product-form input {
@@ -50,7 +51,7 @@
                 color: #2F3E2F;
                 font-weight: bold;
                 border: none;
-                padding: 14px 28px;
+                padding: 14px 100px;
                 border-radius: 10px;
                 font-size: 16px;
                 cursor: pointer;
@@ -76,25 +77,26 @@
             .back-link:hover {
                 background-color: #FFF0CE;
             }
+
+            #liveToast {
+                position: fixed !important;
+                top: 20px !important;
+                left: 20px !important;
+                z-index: 3000 !important;
+            }
+
         </style>
 </head>
 <body>
-<jsp:include page="home.jsp"/>
 
 <div class="content">
-<h1>Add New Customer</h1>
-
-<form class="add-product-form" action="/api/create" method="post">
-    <input type="text" name="name" placeholder="Name" required /><br>
-    <input type="email" name="email" placeholder="Email" required /><br>
-    <input type="text" name="phone" placeholder="Phone" required /><br>
-    <input type="text" name="address" placeholder="Address" required /><br>
-    <button type="submit">Add Customer</button>
-</form>
-
-<div style="text-align:center;">
-        <a href="/customer" class="back-link">Back to Customers List</a>
-    </div>
+    <form class="add-product-form" id="customerForm" action="/api/create" method="post" onsubmit="localStorage.setItem('StatusAdd', 'added');">
+        <input type="text" name="name" id="customerName placeholder="Name" required /><br>
+        <input type="email" name="email" id="customerEmail placeholder="Email" required /><br>
+        <input type="text" name="phone" id="customerPhone placeholder="Phone" required /><br>
+        <input type="text" name="address" id="customerAddress placeholder="Address" required /><br>
+        <button type="submit" id="formSubmitBtn"Save</button>
+    </form>
 </div>
 </body>
 </html>

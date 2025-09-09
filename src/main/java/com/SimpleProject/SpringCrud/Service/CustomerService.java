@@ -50,4 +50,12 @@ public class CustomerService {
     public List<CustomerModel> getAllCustomers() {
         return customerRepository.findAll();
     }
+
+    public boolean existsByPhone(String phone) {
+        return customerRepository.existsByPhone(phone);
+    }
+
+    public boolean existsByEmail(String email) {
+        return customerRepository.existsByEmail(email);
+    }
 }

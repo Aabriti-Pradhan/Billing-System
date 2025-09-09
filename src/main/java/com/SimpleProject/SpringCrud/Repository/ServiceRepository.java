@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceModel, Long> {
     Optional<ServiceModel> findByServiceName(String serviceName);
+    Optional<ServiceModel> findByServiceId(Long id);
 }

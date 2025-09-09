@@ -15,87 +15,93 @@
 </head>
 <body>
 
-<h1>Invoice: ${invoice.invoiceId}</h1>
-<p>Date: ${invoice.invoiceDate}</p>
-<p>Customer: ${invoice.customer.name} (ID: ${invoice.customer.customerId})</p>
+<h1>Invoice</h1>
 
-<!-- ================== PRODUCT ITEMS ================== -->
-<c:if test="${not empty invoice.invoiceItems}">
-    <h2>Product Items</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Product Name</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:set var="productTotal" value="0"/>
-        <c:forEach var="pitem" items="${invoice.invoiceItems}">
-            <tr>
-                <td>${pitem.product.name}</td>
-                <td>${pitem.quantity}</td>
-                <td>${pitem.product.price}</td>
-                <td>
+<c:set var="productTotal" value="0"/>
+<c:set var="serviceTotal" value="0"/>
+
+<!-- ========== PRODUCT INVOICE ========== -->
+<c:if test="${not empty invoice}">
+    <h2>Product Invoice: ${invoice.invoiceId}</h2>
+    <p>Date: ${invoice.invoiceDate}</p>
+    <p>Customer: ${invoice.customer.name} (ID: ${invoice.customer.customerId})</p>
+
+    <c:if test="${not empty invoice.invoiceItems}">
+        <h3>Product Items</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="pitem" items="${invoice.invoiceItems}">
                     <c:set var="lineTotal" value="${pitem.quantity * pitem.product.price}"/>
-                    ${lineTotal}
+                    <tr>
+                        <td>${pitem.product.name}</td>
+                        <td>${pitem.quantity}</td>
+                        <td>${pitem.product.price}</td>
+                        <td>${lineTotal}</td>
+                    </tr>
                     <c:set var="productTotal" value="${productTotal + lineTotal}"/>
-                </td>
-            </tr>
-        </c:forEach>
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="3">Product Total</td>
-            <td>${productTotal}</td>
-        </tr>
-        </tfoot>
-    </table>
+                </c:forEach>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">Product Total</td>
+                    <td>${productTotal}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </c:if>
 </c:if>
 
-<!-- ================== SERVICE ITEMS ================== -->
-<c:if test="${not empty invoice.serviceInvoiceItems}">
-    <h2>Service Items</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Service Name</th>
-            <th>Amount</th>
-            <th>VAT (%)</th>
-            <th>Total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:set var="serviceTotal" value="0"/>
-        <c:forEach var="sitem" items="${invoice.serviceInvoiceItems}">
-            <tr>
-                <td>${sitem.service.serviceName}</td>
-                <td>${sitem.amount}</td>
-                <td>${sitem.vat}</td>
-                <td>
+<!-- ========== SERVICE INVOICE ========== -->
+<c:if test="${not empty serviceInvoice}">
+    <h2>Service Invoice: ${serviceInvoice.invoiceNumber}</h2>
+    <p>Date: ${serviceInvoice.date}</p>
+    <p>Customer: ${serviceInvoice.customer.name} (ID: ${serviceInvoice.customer.customerId})</p>
+
+    <c:if test="${not empty serviceInvoice.serviceInvoiceItems}">
+        <h3>Service Items</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Service Name</th>
+                    <th>Amount</th>
+                    <th>VAT (%)</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="sitem" items="${serviceInvoice.serviceInvoiceItems}">
                     <c:set var="lineTotal" value="${sitem.amount + (sitem.amount * sitem.vat / 100)}"/>
-                    ${lineTotal}
+                    <tr>
+                        <td>${sitem.service.serviceName}</td>
+                        <td>${sitem.amount}</td>
+                        <td>${sitem.vat}</td>
+                        <td>${lineTotal}</td>
+                    </tr>
                     <c:set var="serviceTotal" value="${serviceTotal + lineTotal}"/>
-                </td>
-            </tr>
-        </c:forEach>
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="3">Service Total</td>
-            <td>${serviceTotal}</td>
-        </tr>
-        </tfoot>
-    </table>
+                </c:forEach>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3">Service Total</td>
+                    <td>${serviceTotal}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </c:if>
 </c:if>
 
-<!-- ================== GRAND TOTAL ================== -->
-<h2>
-    Grand Total:
-    <c:out value="${(productTotal != null ? productTotal : 0) + (serviceTotal != null ? serviceTotal : 0)}"/>
-</h2>
+<!-- ========== GRAND TOTAL (Rounded Up) ========== -->
+<c:set var="grandTotal" value="${productTotal + serviceTotal}" />
+<c:set var="grandTotalRounded" value="${(grandTotal + 0.9999) div 1}" />
+<h2>Grand Total: ${grandTotalRounded}</h2>
 
 </body>
 </html>

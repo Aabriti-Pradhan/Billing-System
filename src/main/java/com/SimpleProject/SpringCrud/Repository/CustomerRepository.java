@@ -14,4 +14,6 @@ public interface CustomerRepository extends JpaRepository<CustomerModel, Long> {
             "FROM CustomerModel c " +
             "WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<CustomerDropdownDTO> searchCustomers(@Param("keyword") String keyword);
+    boolean existsByPhone(String phone);
+    boolean existsByEmail(String email);
 }

@@ -28,70 +28,83 @@
     <div class="header">
         <div class="customer-info">
             <h2>Customer Details</h2>
-            <p><b>Name:</b> ${invoice.customer.name}</p>
-            <p><b>Email:</b> ${invoice.customer.email}</p>
-            <p><b>Phone:</b> ${invoice.customer.phone}</p>
+            <p><b>Name:</b> ${mainInvoice.customer.name}</p>
+            <p><b>Email:</b> ${mainInvoice.customer.email}</p>
+            <p><b>Phone:</b> ${mainInvoice.customer.phone}</p>
         </div>
         <div class="date-info">
             <h2>Invoice</h2>
-            <p><b>Date:</b> ${invoice.invoiceDate}</p>
-            <p><b>Invoice ID:</b> ${invoice.invoiceId}</p>
+            <p><b>Date:</b> ${mainInvoice.invoiceDate}</p>
+            <p><b>Invoice #:</b> ${mainInvoice.invoiceNumber}</p>
         </div>
     </div>
 
-    <h3>Purchased Items</h3>
+    <h3>Purchased Items & Services</h3>
     <table>
         <thead>
         <tr>
-            <th>Product</th>
-            <th>Price</th>
+            <th>Sno.</th>
+            <th>Name</th>
+            <th>Unit/Price</th>
             <th>Quantity</th>
             <th>Line Total</th>
         </tr>
         </thead>
         <tbody>
-        <c:set var="subTotal" value="0" />
-        <c:forEach var="item" items="${invoice.invoiceItems}">
-            <tr>
-                <td>${item.product.name}</td>
-                <td><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0.00"/></td>
-                <td>${item.quantity}</td>
-                <td>
-                    <fmt:formatNumber value="${item.subtotal}" pattern="#,##0.00"/>
-                    <c:set var="subTotal" value="${subTotal + item.subtotal}" />
-                </td>
+        <c:forEach var="prodInvoice" items="${mainInvoice.productInvoices}">
+            <c:forEach var="item" items="${prodInvoice.invoiceItems}" varStatus="status">
+                <tr>
+                    <td>${status.index + 1}</td>
+                    <td>${item.product.name}</td>
+                    <td><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0.00"/></td>
+                    <td>${item.quantity}</td>
+                    <td><fmt:formatNumber value="${item.subtotal}" pattern="#,##0.00"/></td>
+                </tr>
+            </c:forEach>
+            <tr class="total-row">
+                <td colspan="4" style="text-align:right;">Products Total:</td>
+                <td><fmt:formatNumber value="${prodInvoice.totalAmount}" pattern="#,##0.00"/></td>
             </tr>
         </c:forEach>
 
-        <tr class="total-row">
-            <td colspan="3" style="text-align:right;">Subtotal:</td>
-            <td><fmt:formatNumber value="${subTotal}" pattern="#,##0.00"/></td>
-        </tr>
 
-        <tr class="total-row">
-            <td colspan="3" style="text-align:right;">
-                Discount
-                <c:choose>
-                    <c:when test="${invoice.percentage}">(${invoice.discount}%)</c:when>
-                    <c:otherwise>(Flat)</c:otherwise>
-                </c:choose>
-            </td>
-            <td>
-                <fmt:formatNumber value="${subTotal - invoice.totalAmount}" pattern="#,##0.00"/>
-            </td>
-        </tr>
-
-        <tr class="total-row">
-            <td colspan="3" style="text-align:right;">Total Amount:</td>
-            <td><fmt:formatNumber value="${invoice.totalAmount}" pattern="#,##0.00"/></td>
-        </tr>
         </tbody>
     </table>
+    <table>
+            <thead>
+            <tr>
+                <th>Sno.</th>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Vat</th>
+                <th>Line Total</th>
+            </tr>
+            </thead>
+            <tbody>
 
-    <form action="${pageContext.request.contextPath}/invoices/pdf/${invoice.invoiceId}">
-        <button>Download Invoice</button>
-    </form>
+            <c:forEach var="servInvoice" items="${mainInvoice.serviceInvoices}">
+                <c:forEach var="item" items="${servInvoice.serviceInvoiceItems}" varStatus="status">
+                    <tr>
+                        <td>${status.index + 1}</td>
+                        <td>${item.service.serviceName}</td>
+                        <td><fmt:formatNumber value="${item.amount}" pattern="#,##0.00"/></td>
+                        <td>${item.vat}</td>
+                        <td><fmt:formatNumber value="${item.amount + (item.amount * item.vat / 100)}" pattern="#,##0.00"/></td>
+                    </tr>
+                </c:forEach>
+            </c:forEach>
 
+            <tr class="total-row">
+                <td colspan="4" style="text-align:right;">Services Total:</td>
+                <td><fmt:formatNumber value="${serviceTotal}" pattern="#,##0.00"/></td>
+            </tr>
+
+            <tr class="total-row">
+                <td colspan="4" style="text-align:right;">Total Amount:</td>
+                <td><fmt:formatNumber value="${mainInvoice.totalAmount}" pattern="#,##0.00"/></td>
+            </tr>
+            </tbody>
+        </table>
 
     <div style="text-align:center;">
         <a href="/api/allInvoice" class="back-link">Back to All Invoices</a>
