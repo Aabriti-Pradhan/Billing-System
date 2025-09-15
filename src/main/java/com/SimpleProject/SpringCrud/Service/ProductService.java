@@ -5,9 +5,11 @@ import com.SimpleProject.SpringCrud.Model.ProductModel;
 import com.SimpleProject.SpringCrud.Repository.CustomerRepository;
 import com.SimpleProject.SpringCrud.Repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 
@@ -25,6 +27,27 @@ public class ProductService {
     public List<ProductModel> readAllProduct() {
 
         return productRepository.findAll();
+    }
+
+    public List<ProductModel> readAllProduct(String sortField, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ?
+                Sort.by(sortField).ascending() :
+                Sort.by(sortField).descending();
+
+        return productRepository.findAll(sort);
+    }
+
+    public List<ProductModel> readActiveProducts(String sortField, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ?
+                Sort.by(sortField).ascending() :
+                Sort.by(sortField).descending();
+
+        return productRepository.findByArchivedFalse(sort);
+    }
+
+    public ProductModel getProductById(Long productId) {
+        Optional<ProductModel> product = productRepository.findById(productId);
+        return product.orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     public ProductModel updateProduct(Long id, ProductModel customerEntity) {
@@ -53,5 +76,19 @@ public class ProductService {
 
     public List<ProductModel> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    public ProductModel saveProduct(ProductModel productModel) {
+        return productRepository.save(productModel);
+    }
+
+    public void unarchiveProducts(List<Long> productId) {
+        List<ProductModel> product = productRepository.findAllById(productId);
+        product.forEach(prod -> prod.setArchived(false));
+        productRepository.saveAll(product);
+    }
+
+    public List<ProductModel> searchProducts(String keyword) {
+        return productRepository.searchProduct(keyword);
     }
 }

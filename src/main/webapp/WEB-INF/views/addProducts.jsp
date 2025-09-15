@@ -13,11 +13,6 @@
             padding: 0;
         }
 
-        .content {
-            padding: 15px 180px;
-            margin-top: -210px;
-        }
-
         h1 {
             text-align: center;
             color: #2F3E2F;
@@ -80,22 +75,15 @@
     </style>
 </head>
 <body>
-<jsp:include page="home.jsp"/>
 
 <div class="content">
-    <h1>Add New Products</h1>
-
     <form class="add-product-form" action="/api/createP" method="post">
         <input type="text" name="name" placeholder="Name" required />
         <input type="text" name="description" placeholder="Description" required />
         <input type="number" name="price" placeholder="Price" required step="0.01" />
         <input type="number" name="stock_quantity" placeholder="Stock Quantity" required />
-        <button type="submit">Add Products</button>
+        <button type="submit" id="formSubmitBtn">Save</button>
     </form>
-
-    <div style="text-align:center;">
-        <a href="/product" class="back-link">Back to Products Page</a>
-    </div>
 </div>
 </body>
 </html>

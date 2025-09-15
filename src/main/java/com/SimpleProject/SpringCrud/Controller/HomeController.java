@@ -46,8 +46,11 @@ public class HomeController {
     }
 
     @GetMapping("/invoice")
-    public String invoicePage() {
-        return "redirect:/api/allInvoice";
+    public String invoicePage(Model model) {
+        model.addAttribute("customers", customerService.getAllCustomers());
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("services", serviceInvoiceService.getAllServices());
+        return "forward:/api/allInvoice";
     }
 
     @GetMapping("/addCustomers")

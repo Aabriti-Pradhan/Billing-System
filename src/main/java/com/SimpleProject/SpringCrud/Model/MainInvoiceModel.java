@@ -17,6 +17,10 @@ public class MainInvoiceModel {
     private String invoiceNumber;
     private LocalDate invoiceDate;
     private Double totalAmount = 0.0;
+    private String formattedInvoiceDate;
+
+    @Column(nullable = false)
+    private boolean archived = false;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -57,4 +61,20 @@ public class MainInvoiceModel {
 
     public List<ServiceInvoiceModel> getServiceInvoices() { return serviceInvoices; }
     public void setServiceInvoices(List<ServiceInvoiceModel> serviceInvoices) { this.serviceInvoices = serviceInvoices; }
+
+    public String getFormattedInvoiceDate() {
+        return formattedInvoiceDate;
+    }
+
+    public void setFormattedInvoiceDate(String formattedInvoiceDate) {
+        this.formattedInvoiceDate = formattedInvoiceDate;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
 }

@@ -2,6 +2,7 @@ package com.SimpleProject.SpringCrud.Controller;
 
 import com.SimpleProject.SpringCrud.DTO.CustomerDTO;
 import com.SimpleProject.SpringCrud.Model.CustomerModel;
+import com.SimpleProject.SpringCrud.Model.MainInvoiceModel;
 import com.SimpleProject.SpringCrud.Service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,11 +30,28 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping("/read")
-    public String readCustomer(Model model) {
-        List<CustomerModel> customers = customerService.readAllCustomer();
+    public String readCustomer(
+            @RequestParam(value = "showArchived", required = false) Boolean showArchived,
+            @RequestParam(value = "sortField", required = false, defaultValue = "name") String sortField,
+            @RequestParam(value = "sortDir", required = false, defaultValue = "asc") String sortDir,
+            Model model) {
+
+        List<CustomerModel> customers;
+
+        //for archived as well as for sorting
+        if (Boolean.TRUE.equals(showArchived)) {
+            customers = customerService.readAllCustomer(sortField, sortDir);
+        } else {
+            customers = customerService.readActiveCustomers(sortField, sortDir);
+        }
+
         model.addAttribute("customers", customers);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+
         return "allCustomers";
     }
+
 
 
     @PostMapping("/create")
@@ -114,4 +133,43 @@ public class CustomerController {
         customerService.deleteCustomer(id);
         return "redirect:/api/read";
     }
+
+    @PostMapping("/customer/archive")
+    @ResponseBody
+    public ResponseEntity<String> archiveCustomers(@RequestBody List<Long> customerId) {
+        try {
+            for(Long id : customerId) {
+                CustomerModel customer = customerService.getCustomerById(id);
+                if(customer != null) {
+                    customer.setArchived(true);
+                    customerService.saveCustomer(customer); // or update
+                }
+            }
+            return ResponseEntity.ok("Customers archived successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error archiving customers");
+        }
+    }
+
+    @PostMapping("/customer/unarchive")
+    @ResponseBody
+    public ResponseEntity<String> unarchiveInvoices(@RequestBody List<Long> customerId) {
+        customerService.unarchiveCustomers(customerId);
+        return ResponseEntity.ok("Unarchived Successfully!");
+    }
+
+    @GetMapping("/customer/search")
+    public String searchCustomers(@RequestParam("keyword") String keyword, Model model) {
+        List<CustomerModel> customers = customerService.searchCustomers(keyword);
+
+        model.addAttribute("customers", customers);
+        model.addAttribute("keyword", keyword);
+
+        model.addAttribute("sortField", "name");
+        model.addAttribute("sortDir", "asc");
+
+        return "allCustomers";
+    }
+
 }

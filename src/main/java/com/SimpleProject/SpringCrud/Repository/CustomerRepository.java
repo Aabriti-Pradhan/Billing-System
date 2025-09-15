@@ -2,6 +2,8 @@ package com.SimpleProject.SpringCrud.Repository;
 
 import com.SimpleProject.SpringCrud.DTO.CustomerDropdownDTO;
 import com.SimpleProject.SpringCrud.Model.CustomerModel;
+import com.SimpleProject.SpringCrud.Model.MainInvoiceModel;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,18 @@ public interface CustomerRepository extends JpaRepository<CustomerModel, Long> {
             "FROM CustomerModel c " +
             "WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<CustomerDropdownDTO> searchCustomers(@Param("keyword") String keyword);
+
     boolean existsByPhone(String phone);
     boolean existsByEmail(String email);
+
+    List<CustomerModel> findByArchivedFalse(Sort sort);
+
+    @Query("SELECT c FROM CustomerModel c " +
+            "WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(c.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(c.phone) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(c.address) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<CustomerModel> searchCustomer(@Param("keyword") String keyword);
+
+
 }

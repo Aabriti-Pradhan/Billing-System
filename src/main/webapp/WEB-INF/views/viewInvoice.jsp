@@ -17,6 +17,7 @@
         tr:nth-child(even) { background-color: #EFF5D2; }
         tr:hover { background-color: #FFF0CE; }
         .total-row { font-weight: bold; background-color: #FFD580; }
+        .total-row-gramd { font-weight: bold; background-color: #415E72; }
         .back-link { display: inline-block; margin-top: 20px; padding: 10px 18px; background-color: #A8BBA3; color: #2F3E2F; text-decoration: none; border-radius: 8px; font-weight: bold; }
         .back-link:hover { background-color: #FFF0CE; }
     </style>
@@ -34,43 +35,46 @@
         </div>
         <div class="date-info">
             <h2>Invoice</h2>
-            <p><b>Date:</b> ${mainInvoice.invoiceDate}</p>
+            <p><b>Date:</b> ${mainInvoice.formattedInvoiceDate}</p>
             <p><b>Invoice #:</b> ${mainInvoice.invoiceNumber}</p>
         </div>
     </div>
 
     <h3>Purchased Items & Services</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Sno.</th>
-            <th>Name</th>
-            <th>Unit/Price</th>
-            <th>Quantity</th>
-            <th>Line Total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach var="prodInvoice" items="${mainInvoice.productInvoices}">
-            <c:forEach var="item" items="${prodInvoice.invoiceItems}" varStatus="status">
-                <tr>
-                    <td>${status.index + 1}</td>
-                    <td>${item.product.name}</td>
-                    <td><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0.00"/></td>
-                    <td>${item.quantity}</td>
-                    <td><fmt:formatNumber value="${item.subtotal}" pattern="#,##0.00"/></td>
+    <c:if test="${not empty mainInvoice.productInvoices}">
+        <table>
+            <thead>
+            <tr>
+                <th>Sno.</th>
+                <th>Name</th>
+                <th>Unit/Price</th>
+                <th>Quantity</th>
+                <th>Line Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach var="prodInvoice" items="${mainInvoice.productInvoices}">
+                <c:forEach var="item" items="${prodInvoice.invoiceItems}" varStatus="status">
+                    <tr>
+                        <td>${status.index + 1}</td>
+                        <td>${item.product.name}</td>
+                        <td><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0.00"/></td>
+                        <td>${item.quantity}</td>
+                        <td><fmt:formatNumber value="${item.subtotal}" pattern="#,##0.00"/></td>
+                    </tr>
+                </c:forEach>
+                <tr class="total-row">
+                    <td colspan="4" style="text-align:right;">Products Total:</td>
+                    <td><fmt:formatNumber value="${prodInvoice.totalAmount}" pattern="#,##0.00"/></td>
                 </tr>
             </c:forEach>
-            <tr class="total-row">
-                <td colspan="4" style="text-align:right;">Products Total:</td>
-                <td><fmt:formatNumber value="${prodInvoice.totalAmount}" pattern="#,##0.00"/></td>
-            </tr>
-        </c:forEach>
 
 
-        </tbody>
-    </table>
-    <table>
+            </tbody>
+        </table>
+    </c:if>
+    <c:if test="${not empty mainInvoice.serviceInvoices}">
+        <table>
             <thead>
             <tr>
                 <th>Sno.</th>
@@ -99,12 +103,22 @@
                 <td><fmt:formatNumber value="${serviceTotal}" pattern="#,##0.00"/></td>
             </tr>
 
-            <tr class="total-row">
-                <td colspan="4" style="text-align:right;">Total Amount:</td>
-                <td><fmt:formatNumber value="${mainInvoice.totalAmount}" pattern="#,##0.00"/></td>
-            </tr>
+
             </tbody>
         </table>
+    </c:if>
+
+    <table>
+        <tr class="total-row-grand">
+            <td colspan="4" style="text-align:right;">Grand Total:</td>
+            <td><fmt:formatNumber value="${mainInvoice.totalAmount}" pattern="#,##0.00"/></td>
+        </tr>
+    </table>
+
+    <form action="/invoices/pdf/${mainInvoice.id}" method="get" style="display:inline;">
+        <button type="submit" class="back-link">Download PDF</button>
+    </form>
+
 
     <div style="text-align:center;">
         <a href="/api/allInvoice" class="back-link">Back to All Invoices</a>

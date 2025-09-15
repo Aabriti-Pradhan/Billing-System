@@ -22,6 +22,9 @@ public class ProductModel {
     @JsonManagedReference("product-invoiceItem")
     private List<InvoiceItemModel> invoiceItems;
 
+    @Column(nullable = false)
+    private boolean archived = false;
+
     public Long getProductId() {
         return productId;
     }
@@ -68,5 +71,13 @@ public class ProductModel {
 
     public void setInvoiceItems(List<InvoiceItemModel> invoiceItems) {
         this.invoiceItems = invoiceItems;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

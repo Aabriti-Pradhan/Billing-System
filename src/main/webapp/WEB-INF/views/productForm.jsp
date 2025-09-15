@@ -90,13 +90,16 @@
 <body>
 
 <div class="content">
-    <form class="add-product-form" id="customerForm" action="/api/create" method="post" onsubmit="localStorage.setItem('StatusAdd', 'added');">
-        <input type="text" name="name" id="customerName placeholder="Name" required /><br>
-        <input type="email" name="email" id="customerEmail placeholder="Email" required /><br>
-        <input type="text" name="phone" id="customerPhone placeholder="Phone" required /><br>
-        <input type="text" name="address" id="customerAddress placeholder="Address" required /><br>
-        <button type="submit" id="formSubmitBtn"Save</button>
+    <form class="add-product-form" id="productForm" action="/api/create" method="post">
+        <input type="hidden" name="id" id="productId" />
+        <input type="text" name="name" id="productName" placeholder="Name" required /><br>
+        <input type="text" name="description" id="productDescription" placeholder="Description" required /><br>
+        <input type="text" name="price" id="productPrice" placeholder="Price" required /><br>
+        <input type="text" name="stockQuantity" id="productStock" placeholder="Stock Quantity" required /><br>
+        <button type="submit" id="formSubmitBtn">Save</button>
     </form>
 </div>
+
+
 </body>
 </html>

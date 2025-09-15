@@ -19,6 +19,9 @@ public class CustomerModel {
     private String phone;
     private String address;
 
+    @Column(nullable = false)
+    private boolean archived = false;
+
     @OneToMany(mappedBy = "customer")
     @JsonManagedReference("customer-invoice")
     private List<InvoiceModel> invoices;
@@ -82,5 +85,13 @@ public class CustomerModel {
 
     public void setServiceInvoices(List<ServiceInvoiceModel> serviceInvoices) {
         this.serviceInvoices = serviceInvoices;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

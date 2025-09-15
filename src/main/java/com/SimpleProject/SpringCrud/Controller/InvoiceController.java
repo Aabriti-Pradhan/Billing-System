@@ -6,14 +6,16 @@ import com.SimpleProject.SpringCrud.Model.*;
 import com.SimpleProject.SpringCrud.Repository.CustomerRepository;
 import com.SimpleProject.SpringCrud.Repository.ProductRepository;
 import com.SimpleProject.SpringCrud.Repository.ServiceRepository;
-import com.SimpleProject.SpringCrud.Service.InvoiceService;
-import com.SimpleProject.SpringCrud.Service.MainInvoiceService;
+import com.SimpleProject.SpringCrud.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,15 @@ public class InvoiceController {
 
     @Autowired
     private InvoiceService invoiceService;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private ServiceInvoiceService serviceInvoiceService;
 
     @PostMapping("/createIForm")
     public String createInvoiceFromForm(
@@ -161,11 +172,65 @@ public class InvoiceController {
     }
 
     @GetMapping("/allInvoice")
-    public String getAllInvoices(Model model) {
-        List<InvoiceModel> invoices = invoiceService.getAllInvoices();
+    public String getAllInvoices(@RequestParam(value = "showArchived", required = false) Boolean showArchived,
+                                 @RequestParam(value = "sortField", defaultValue = "invoiceDate") String sortField,
+                                 @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir,
+                                 Model model) {
+        List<MainInvoiceModel> invoices = mainInvoiceService.getAllInvoices(sortField, sortDir);
+
+        // If showArchived is null or false, filter archived invoices
+        if (showArchived == null || !showArchived) {
+            invoices = invoices.stream()
+                    .filter(inv -> !inv.isArchived())
+                    .toList();
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM, yyyy"); // 9 September, 2025
+
+        // Populate formatted date
+        for (MainInvoiceModel inv : invoices) {
+            if (inv.getInvoiceDate() != null) {
+                inv.setFormattedInvoiceDate(inv.getInvoiceDate().format(formatter));
+            }
+        }
+
+        model.addAttribute("customers", customerService.getAllCustomers());
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("services", serviceInvoiceService.getAllServices());
+
         model.addAttribute("invoices", invoices);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
         return "allInvoices";
     }
+
+    @PostMapping("/archive")
+    @ResponseBody
+    public ResponseEntity<String> archiveInvoices(@RequestBody List<Long> ids) {
+        try {
+            for(Long id : ids) {
+                MainInvoiceModel invoice = mainInvoiceService.getInvoiceById(id);
+                if(invoice != null) {
+                    invoice.setArchived(true);
+                    mainInvoiceService.saveInvoice(invoice); // or update
+                }
+            }
+            return ResponseEntity.ok("Invoices archived successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error archiving invoices");
+        }
+    }
+
+    @PostMapping("/unarchive")
+    @ResponseBody
+    public ResponseEntity<String> unarchiveInvoices(@RequestBody List<Long> ids) {
+        mainInvoiceService.unarchiveInvoices(ids);
+        return ResponseEntity.ok("Unarchived Successfully!");
+    }
+
+
+
 
     @GetMapping("/products/search")
     @ResponseBody
@@ -181,7 +246,55 @@ public class InvoiceController {
 
     @PostMapping("/invoice/delete/{id}")
     public String deleteInvoice(@PathVariable Long id) {
-        invoiceService.deleteInvoice(id);
+        mainInvoiceService.deleteInvoice(id);
         return "redirect:/api/allInvoice";
     }
+
+    @GetMapping("/invoice/view/{id}")
+    public String viewInvoice(@PathVariable Long id, Model model) {
+        MainInvoiceModel mainInvoice = mainInvoiceService.getInvoiceById(id);
+
+        // product total = sum of each InvoiceModel.totalAmount
+        double productTotal = mainInvoice.getProductInvoices().stream()
+                .mapToDouble(InvoiceModel::getTotalAmount)
+                .sum();
+
+        // service total = mainTotal - productTotal (since you saved mainTotal already)
+        double serviceTotal = mainInvoice.getTotalAmount() - productTotal;
+
+        // Format invoice date as string
+        if (mainInvoice.getInvoiceDate() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM, yyyy"); // 9 September, 2025
+            mainInvoice.setFormattedInvoiceDate(mainInvoice.getInvoiceDate().format(formatter));
+        }
+
+        model.addAttribute("mainInvoice", mainInvoice);
+        model.addAttribute("productTotal", productTotal);
+        model.addAttribute("serviceTotal", serviceTotal);
+
+        return "viewInvoice";
+    }
+
+    @GetMapping("/invoices/search")
+    public String searchInvoices(@RequestParam("keyword") String keyword, Model model) {
+        List<MainInvoiceModel> invoices = mainInvoiceService.searchInvoices(keyword);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM, yyyy");
+        for (MainInvoiceModel inv : invoices) {
+            if (inv.getInvoiceDate() != null) {
+                inv.setFormattedInvoiceDate(inv.getInvoiceDate().format(formatter));
+            }
+        }
+
+        model.addAttribute("invoices", invoices);
+        model.addAttribute("keyword", keyword);
+
+        model.addAttribute("sortField", "invoiceDate");
+        model.addAttribute("sortDir", "asc");
+
+        return "allInvoices";
+    }
+
+
+
 }
