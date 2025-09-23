@@ -60,115 +60,125 @@ public class InvoiceController {
             Model model
     ) {
 
-        CustomerModel customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        try {
+            CustomerModel customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        MainInvoiceModel mainInvoice = new MainInvoiceModel();
-        mainInvoice.setCustomer(customer);
+            MainInvoiceModel mainInvoice = new MainInvoiceModel();
+            mainInvoice.setCustomer(customer);
 
-        List<InvoiceModel> productInvoices = new ArrayList<>();
-        double productTotal = 0.0;
-        double serviceTotal = 0.0;
-        double mainTotal = 0.0;
+            List<InvoiceModel> productInvoices = new ArrayList<>();
+            double productTotal = 0.0;
+            double serviceTotal = 0.0;
+            double mainTotal = 0.0;
 
-        // PRODUCT INVOICES
-        if (productId != null && quantity != null && !productId.isEmpty()) {
-            InvoiceModel invoice = new InvoiceModel();
-            invoice.setCustomer(customer);
-            invoice.setDiscount(discount);
-            invoice.setPercentage(isPercentage);
-            invoice.setMainInvoice(mainInvoice);
-            invoice.setInvoiceDate(LocalDate.now());  // set date
+            // PRODUCT INVOICES
+            if (productId != null && quantity != null && !productId.isEmpty()) {
+                InvoiceModel invoice = new InvoiceModel();
+                invoice.setCustomer(customer);
+                invoice.setDiscount(discount);
+                invoice.setPercentage(isPercentage);
+                invoice.setMainInvoice(mainInvoice);
+                invoice.setInvoiceDate(LocalDate.now());  // set date
 
-            List<InvoiceItemModel> items = new ArrayList<>();
+                List<InvoiceItemModel> items = new ArrayList<>();
 
-            for (int i = 0; i < productId.size(); i++) {
-                if (productId.get(i) != null && quantity.get(i) != null && quantity.get(i) > 0) {
-                    ProductModel product = productRepository.findById(productId.get(i))
-                            .orElseThrow(() -> new RuntimeException("Product not found"));
+                for (int i = 0; i < productId.size(); i++) {
+                    if (productId.get(i) != null && quantity.get(i) != null && quantity.get(i) > 0) {
+                        ProductModel product = productRepository.findById(productId.get(i))
+                                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-                    InvoiceItemModel item = new InvoiceItemModel();
-                    item.setProduct(product);
-                    item.setQuantity(quantity.get(i));
-                    item.setUnitPrice(product.getPrice());
+                        InvoiceItemModel item = new InvoiceItemModel();
+                        item.setProduct(product);
+                        item.setQuantity(quantity.get(i));
+                        item.setUnitPrice(product.getPrice());
 
-                    double lineTotal = item.getUnitPrice() * item.getQuantity();
-                    item.setSubtotal(lineTotal);  // raw line total (before invoice discount)
+                        double lineTotal = item.getUnitPrice() * item.getQuantity();
+                        item.setSubtotal(lineTotal);  // raw line total (before invoice discount)
 
-                    productTotal += lineTotal;  // accumulate invoice total
+                        productTotal += lineTotal;  // accumulate invoice total
 
-                    item.setInvoice(invoice);
-                    items.add(item);
+                        item.setInvoice(invoice);
+                        items.add(item);
+                    }
+                }
+
+                // apply discount ON TOTAL
+                if (isPercentage) {
+                    productTotal -= (productTotal * discount / 100);
+                } else {
+                    productTotal -= discount;
+                }
+
+                // assign final discounted total to invoice
+                invoice.setTotalAmount(productTotal);
+                invoice.setInvoiceItems(items);
+
+                productInvoices.add(invoice);
+            }
+
+            mainInvoice.setProductInvoices(productInvoices);
+
+            // SERVICE INVOICES
+            List<ServiceInvoiceModel> serviceInvoices = new ArrayList<>();
+            if (serviceId != null && amount != null && !serviceId.isEmpty()) {
+                for (int i = 0; i < serviceId.size(); i++) {
+                    if (serviceId.get(i) != null && amount.get(i) != null && amount.get(i) > 0) {
+
+                        ServiceInvoiceModel serviceInvoice = new ServiceInvoiceModel();
+                        serviceInvoice.setCustomer(customer);
+                        serviceInvoice.setDate(LocalDate.now());
+                        serviceInvoice.setMainInvoice(mainInvoice);
+
+                        List<ServiceInvoiceItemModel> serviceItems = new ArrayList<>();
+                        ServiceInvoiceItemModel item = new ServiceInvoiceItemModel();
+
+                        // Fetch the actual service from the database
+                        ServiceModel service = serviceRepository.findById(serviceId.get(i))
+                                .orElseThrow(() -> new RuntimeException("Service not found"));
+                        item.setService(service);
+
+                        item.setAmount(amount.get(i));
+                        item.setVat(vat != null ? vat : 0.0);
+
+                        // line total = amount + vat
+                        double vatAmount = item.getAmount() * item.getVat() / 100;
+                        double lineTotal = item.getAmount() + vatAmount;
+
+                        item.setServiceInvoice(serviceInvoice);
+                        serviceItems.add(item);
+
+                        serviceInvoice.setServiceInvoiceItems(serviceItems);
+                        serviceInvoices.add(serviceInvoice);
+
+                        serviceTotal += lineTotal; // add to service subtotal
+                    }
                 }
             }
+            mainInvoice.setServiceInvoices(serviceInvoices);
 
-            // apply discount ON TOTAL
-            if (isPercentage) {
-                productTotal -= (productTotal * discount / 100);
-            } else {
-                productTotal -= discount;
-            }
 
-            // assign final discounted total to invoice
-            invoice.setTotalAmount(productTotal);
-            invoice.setInvoiceItems(items);
+            // GRAND TOTAL
+            mainTotal = productTotal + serviceTotal;
+            mainTotal = Math.ceil(mainTotal);
+            mainInvoice.setTotalAmount(mainTotal);
 
-            productInvoices.add(invoice);
+            // Save main invoice with cascade
+            mainInvoiceService.save(mainInvoice);
+
+            model.addAttribute("mainInvoice", mainInvoice);
+            model.addAttribute("productTotal", productTotal); // send to JSP
+            model.addAttribute("serviceTotal", serviceTotal); // send to JSP
+
+            return "viewInvoice"; // JSP page
         }
+        catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            // This catches database-level unique constraint violations
+            model.addAttribute("toastMessage", "ID or unique field already exists in the database!");
+            model.addAttribute("toastType", "danger");
 
-        mainInvoice.setProductInvoices(productInvoices);
-
-        // SERVICE INVOICES
-        List<ServiceInvoiceModel> serviceInvoices = new ArrayList<>();
-        if (serviceId != null && amount != null && !serviceId.isEmpty()) {
-            for (int i = 0; i < serviceId.size(); i++) {
-                if (serviceId.get(i) != null && amount.get(i) != null && amount.get(i) > 0) {
-
-                    ServiceInvoiceModel serviceInvoice = new ServiceInvoiceModel();
-                    serviceInvoice.setCustomer(customer);
-                    serviceInvoice.setDate(LocalDate.now());
-                    serviceInvoice.setMainInvoice(mainInvoice);
-
-                    List<ServiceInvoiceItemModel> serviceItems = new ArrayList<>();
-                    ServiceInvoiceItemModel item = new ServiceInvoiceItemModel();
-
-                    // Fetch the actual service from the database
-                    ServiceModel service = serviceRepository.findById(serviceId.get(i))
-                            .orElseThrow(() -> new RuntimeException("Service not found"));
-                    item.setService(service);
-
-                    item.setAmount(amount.get(i));
-                    item.setVat(vat != null ? vat : 0.0);
-
-                    // line total = amount + vat
-                    double vatAmount = item.getAmount() * item.getVat() / 100;
-                    double lineTotal = item.getAmount() + vatAmount;
-
-                    item.setServiceInvoice(serviceInvoice);
-                    serviceItems.add(item);
-
-                    serviceInvoice.setServiceInvoiceItems(serviceItems);
-                    serviceInvoices.add(serviceInvoice);
-
-                    serviceTotal += lineTotal; // add to service subtotal
-                }
-            }
+            return "allInvoices"; // stay on same page with toast
         }
-        mainInvoice.setServiceInvoices(serviceInvoices);
-
-
-        // GRAND TOTAL
-        mainTotal = productTotal + serviceTotal;
-        mainInvoice.setTotalAmount(mainTotal);
-
-        // Save main invoice with cascade
-        mainInvoiceService.save(mainInvoice);
-
-        model.addAttribute("mainInvoice", mainInvoice);
-        model.addAttribute("productTotal", productTotal); // send to JSP
-        model.addAttribute("serviceTotal", serviceTotal); // send to JSP
-
-        return "viewInvoice"; // JSP page
     }
 
     @GetMapping("/allInvoice")

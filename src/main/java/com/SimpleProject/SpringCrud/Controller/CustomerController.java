@@ -71,44 +71,57 @@ public class CustomerController {
             }
             //return toast here
         }
+        try {
+            // Check uniqueness of phone and email
+            if (customerService.existsByPhone(customerDTO.getPhone())) {
+                model.addAttribute("toastMessage", "Phone already exists!");
+                model.addAttribute("toastType", "danger");
+                // Add the previously entered values so the form can be prefilled
+                model.addAttribute("name", name);
+                model.addAttribute("email", email);
+                model.addAttribute("phone", phone);
+                model.addAttribute("address", address);
+                return "addCustomers"; // reload the same add page
+            }
 
-        // Check uniqueness of phone and email
-        if (customerService.existsByPhone(customerDTO.getPhone())) {
-            model.addAttribute("toastMessage", "Phone already exists!");
+            if (customerService.existsByEmail(customerDTO.getEmail())) {
+                model.addAttribute("toastMessage", "Email already exists!");
+                model.addAttribute("toastType", "danger");
+                model.addAttribute("name", name);
+                model.addAttribute("email", email);
+                model.addAttribute("phone", phone);
+                model.addAttribute("address", address);
+                return "addCustomers";
+            }
+
+            CustomerModel customer = new CustomerModel();
+            customer.setName(name);
+            customer.setEmail(email);
+            customer.setPhone(phone);
+            customer.setAddress(address);
+
+            customerService.addCustomer(customer);
+
+            redirectAttributes.addFlashAttribute("toastMessage", "Customer created successfully!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+
+            redirectAttributes.addFlashAttribute("toastMessage", "Customer created successfully!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+            return "redirect:/api/read";
+        }
+        catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            // This catches database-level unique constraint violations
+            model.addAttribute("toastMessage", "ID or unique field already exists in the database!");
             model.addAttribute("toastType", "danger");
-            // Add the previously entered values so the form can be prefilled
+
+            // Repopulate entered values
             model.addAttribute("name", name);
             model.addAttribute("email", email);
             model.addAttribute("phone", phone);
             model.addAttribute("address", address);
-            return "addCustomers"; // reload the same add page
+
+            return "allCustomers"; // stay on same page with toast
         }
-
-        if (customerService.existsByEmail(customerDTO.getEmail())) {
-            model.addAttribute("toastMessage", "Email already exists!");
-            model.addAttribute("toastType", "danger");
-            model.addAttribute("name", name);
-            model.addAttribute("email", email);
-            model.addAttribute("phone", phone);
-            model.addAttribute("address", address);
-            return "addCustomers";
-        }
-
-        CustomerModel customer = new CustomerModel();
-        customer.setName(name);
-        customer.setEmail(email);
-        customer.setPhone(phone);
-        customer.setAddress(address);
-
-        customerService.addCustomer(customer);
-
-        redirectAttributes.addFlashAttribute("toastMessage", "Customer created successfully!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
-
-        redirectAttributes.addFlashAttribute("toastMessage", "Customer created successfully!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
-        return "redirect:/api/read";
-
     }
 
 
@@ -156,7 +169,7 @@ public class CustomerController {
     @ResponseBody
     public ResponseEntity<String> unarchiveInvoices(@RequestBody List<Long> customerId) {
         customerService.unarchiveCustomers(customerId);
-        return ResponseEntity.ok("Unarchived Successfully!");
+        return ResponseEntity.ok("Restored Successfully!");
     }
 
     @GetMapping("/customer/search")
@@ -171,5 +184,26 @@ public class CustomerController {
 
         return "allCustomers";
     }
+
+    //getting customer for update
+    @GetMapping("/customer/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getCustomer(@PathVariable Long id) {
+        CustomerModel customer = customerService.getCustomerById(id);
+        if (customer != null) {
+            CustomerModel dto = new CustomerModel();
+            dto.setName(customer.getName());
+            dto.setEmail(customer.getEmail());
+            dto.setPhone(customer.getPhone());
+            dto.setAddress(customer.getAddress());
+            return ResponseEntity.ok(dto);
+        } else {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Customer not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+    }
+
+
 
 }

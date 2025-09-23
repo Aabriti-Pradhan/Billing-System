@@ -19,7 +19,8 @@ public class ServiceModel implements Serializable {
     @Column(nullable = false)
     private Double amount;
 
-    private Double baseAmount; // optional
+    @Column(nullable = false)
+    private boolean archived = false;
 
     @OneToMany(mappedBy = "service")
     @JsonManagedReference("service-invoice-items")
@@ -41,12 +42,12 @@ public class ServiceModel implements Serializable {
         this.serviceName = serviceName;
     }
 
-    public double getBaseAmount() {
-        return baseAmount;
+    public Double getAmount() {
+        return amount;
     }
 
-    public void setBaseAmount(double baseAmount) {
-        this.baseAmount = baseAmount;
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 
     public List<ServiceInvoiceItemModel> getServiceInvoiceItems() {
@@ -57,15 +58,11 @@ public class ServiceModel implements Serializable {
         this.serviceInvoiceItems = serviceInvoiceItems;
     }
 
-    public Double getAmount() {
-        return amount;
+    public boolean isArchived() {
+        return archived;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public void setBaseAmount(Double baseAmount) {
-        this.baseAmount = baseAmount;
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

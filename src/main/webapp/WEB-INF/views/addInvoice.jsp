@@ -487,7 +487,6 @@
                         serviceId: "${serv.serviceId}",
                         serviceName: "${serv.serviceName}",
                         serviceAmount: "${serv.amount}",
-                        serviceBaseAmount: "${serv.baseAmount}",
                         serviceInvoiceItems: "${serv.serviceInvoiceItems}"
                     }<c:if test="${!status.last}">,</c:if>
                 </c:forEach>

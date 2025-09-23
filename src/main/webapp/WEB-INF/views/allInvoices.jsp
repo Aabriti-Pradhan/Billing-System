@@ -182,7 +182,7 @@
 
             <!--add button-->
             <button type="button" data-bs-toggle="modal" class="btn btn-outline-secondary btn-lg" data-bs-target="#invoiceModal" data-action="add" style="padding: 0;">
-                <i class="bi bi-plus" style="font-size: 3rem;"></i>
+                <i class="bi bi-plus h1" ></i>
             </button>
             <!--archived icon-->
             <button type="button" id="toggleArchiveBtn" class="btn btn-outline-secondary">
@@ -250,6 +250,21 @@
             </c:forEach>
         </tbody>
     </table>
+
+    <!--checking toast message for redundant id-->
+    <c:if test="${not empty toastMessage}">
+        <div id="serverToast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+            <div class="toast align-items-center text-bg-${toastType}" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${toastMessage}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -592,6 +607,15 @@
                 }
             }
         });
+
+    //to show toast message if id is redundant
+    document.addEventListener("DOMContentLoaded", function() {
+        const toastEl = document.querySelector("#serverToast .toast");
+        if (toastEl) {
+            const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            bsToast.show();
+        }
+    });
 
     //to open modal of sorting
     //document.getElementById("sort-btn").addEventListener("click", function (e) {

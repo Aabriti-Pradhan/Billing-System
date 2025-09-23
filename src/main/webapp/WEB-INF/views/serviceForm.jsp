@@ -90,12 +90,10 @@
 <body>
 
 <div class="content">
-    <form class="add-product-form" id="productForm" action="/api/createP" method="post">
-        <input type="hidden" name="id" id="productId" />
-        <input type="text" name="name" id="productName" placeholder="Name" required /><br>
-        <input type="text" name="description" id="productDescription" placeholder="Description" required /><br>
-        <input type="text" name="price" id="productPrice" placeholder="Price" required /><br>
-        <input type="text" name="stockQuantity" id="productStock" placeholder="Stock Quantity" required /><br>
+    <form class="add-product-form" id="serviceForm" action="/api/createS" method="post">
+        <input type="hidden" name="id" id="serviceId" />
+        <input type="text" name="name" id="serviceName" placeholder="Name" required /><br>
+        <input type="text" name="amount" id="serviceAmount" placeholder="Amount" required /><br>
         <button type="submit" id="formSubmitBtn">Save</button>
     </form>
 </div>

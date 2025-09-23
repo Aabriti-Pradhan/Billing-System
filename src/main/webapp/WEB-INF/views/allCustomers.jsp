@@ -139,8 +139,6 @@
             <button id="archiveBtn" class="btn btn-warning"><i class="bi bi-archive"></i> Archive Selected</button>
         </div>
         <div class="head-space">
-            <!--sort by-->
-            <!-- <button class="sort-btn" id="sort-btn"><i class="bi bi-filter-circle-fill fs-3"><small>Sort By</small></i></button> -->
             <!-- search bar -->
             <form action="${pageContext.request.contextPath}/api/customer/search" method="get">
                 <div class="input-group mb-3">
@@ -152,11 +150,11 @@
             </form>
             <!--add button-->
             <button type="button" data-bs-toggle="modal" class="btn btn-outline-secondary btn-lg" data-bs-target="#customerModal" data-action="add" style="padding: 0 0; margin: 0;">
-                <i class="bi bi-plus" style="font-size: 3rem;"></i>
+                <i class="bi bi-plus h1"></i>
             </button>
             <!--archived icon-->
             <button type="button" id="toggleArchiveBtn" class="btn btn-outline-secondary">
-                <i class="bi bi-archive-fill fs-3"></i>
+                <i class="bi bi-archive-fill"></i>
             </button>
         </div>
     </div>
@@ -227,10 +225,6 @@
                             data-bs-toggle="modal"
                             data-bs-target="#customerModal"
                             data-id="${cust.customerId}"
-                            data-name="${cust.name}"
-                            data-email="${cust.email}"
-                            data-phone="${cust.phone}"
-                            data-address="${cust.address}"
                             data-action="update">
                         <i class="bi bi-pencil-square fs-3 text-dark"></i>
                     </button>
@@ -243,6 +237,21 @@
         </c:forEach>
         </tbody>
     </table>
+
+    <!--checking toast message for redundant id-->
+    <c:if test="${not empty toastMessage}">
+        <div id="serverToast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+            <div class="toast align-items-center text-bg-${toastType}" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${toastMessage}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
 
     <!-- Add and Update Customer Modal -->
     <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
@@ -570,6 +579,15 @@
         });
     });
 
+    //to show toast message if id is redundant
+    document.addEventListener("DOMContentLoaded", function() {
+        const toastEl = document.querySelector("#serverToast .toast");
+        if (toastEl) {
+            const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            bsToast.show();
+        }
+    });
+
     //toggle between archive and unarchive
 
     let showArchived = localStorage.getItem("showArchived") === "true";
@@ -694,17 +712,34 @@
             document.getElementById('customerPhone').value = '';
             document.getElementById('customerAddress').value = '';
         } else if (action === 'update') {
-            modalTitle.textContent = 'Update Customer';
-            customerForm.action = '/api/update';
-            submitBtn.textContent = 'Update Customer';
+              modalTitle.textContent = 'Update Customer';
+              customerForm.action = '/api/update';
+              submitBtn.textContent = 'Update Customer';
+              const customerId = button.getAttribute('data-id');
+              console.log("Customer ID:", customerId);
 
-            // fill fields
-            document.getElementById('customerId').value = button.getAttribute('data-id');
-            document.getElementById('customerName').value = button.getAttribute('data-name');
-            document.getElementById('customerEmail').value = button.getAttribute('data-email');
-            document.getElementById('customerPhone').value = button.getAttribute('data-phone');
-            document.getElementById('customerAddress').value = button.getAttribute('data-address');
-        }
+                console.log("Fetching customer:", `/api/customer/${customerId}`);
+                console.log("Customer ID before fetch:", customerId, typeof customerId);
+                console.log("About to fetch customer:", customerId);
+
+              // Fetch customer data from server
+              fetch('/api/customer/' + customerId)
+              .then(res => {
+                  if(!res.ok) throw new Error('Customer not found');
+                  return res.json();
+              })
+              .then(data => {
+                  document.getElementById('customerId').value = customerId;
+                  document.getElementById('customerName').value = data.name;
+                  document.getElementById('customerEmail').value = data.email;
+                  document.getElementById('customerPhone').value = data.phone;
+                  document.getElementById('customerAddress').value = data.address;
+              })
+              .catch(err => {
+                  console.error(err);
+                  alert('Failed to load customer data');
+              });
+          }
     });
 </script>
 

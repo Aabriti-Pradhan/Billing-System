@@ -88,9 +88,8 @@ public class HomeController {
     }
 
     @GetMapping("/service")
-    public String servicePage(Model model) {
-        model.addAttribute("customers", customerService.readAllCustomer());
-        return "service";
+    public String servicePage() {
+        return "redirect:/api/readS";
     }
 
     @GetMapping("/addInvoice")

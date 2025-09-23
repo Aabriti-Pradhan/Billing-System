@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>All Products</title>
+    <title>All Services</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/>
     <style>
@@ -144,14 +144,14 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="header">
-                <h1>Products List</h1>
+                <h1>Services List</h1>
                 <button id="archiveBtn" class="btn btn-warning"><i class="bi bi-archive"></i> Archive Selected</button>
             </div>
             <div class="head-space">
                 <!--sort by-->
                 <!-- <button class="sort-btn" id="sort-btn"><i class="bi bi-filter-circle-fill fs-3"><small>Sort By</small></i></button> -->
                 <!-- search bar -->
-                <form action="${pageContext.request.contextPath}/api/product/search" method="get">
+                <form action="${pageContext.request.contextPath}/api/service/search" method="get">
                     <div class="input-group mb-3">
                         <input type="text" name="keyword" class="form-control" placeholder="Search products..." value="${keyword}">
                         <button class="btn btn-outline-secondary" type="submit">
@@ -160,8 +160,8 @@
                     </div>
                 </form>
                 <!--add button-->
-                <button type="button" data-bs-toggle="modal" class="btn btn-outline-secondary btn-lg" data-bs-target="#productModal" data-action="add" style="padding: 0 0; margin: 0;">
-                    <i class="bi bi-plus h1" ></i>
+                <button type="button" data-bs-toggle="modal" class="btn btn-outline-secondary btn-lg" data-bs-target="#serviceModal" data-action="add" style="padding: 0 0; margin: 0;">
+                    <i class="bi bi-plus h1"></i>
                 </button>
                 <!--archived icon-->
                 <button type="button" id="toggleArchiveBtn" class="btn btn-outline-secondary">
@@ -177,7 +177,7 @@
                     <th>
                         <div class="d-flex justify-content-between align-items-center">
                             Name
-                            <form method="get" action="/api/readP" style="display:inline;">
+                            <form method="get" action="/api/readS" style="display:inline;">
                                 <input type="hidden" name="sortField" value="name"/>
                                 <input type="hidden" name="sortDir" value="asc"/>
                                 <button type="button" class="btn btn-secondary btn-sm sort-button">
@@ -186,24 +186,11 @@
                             </form>
                         </div>
                     </th>
-                    <th>Description</th>
                     <th>
                         <div class="d-flex justify-content-between align-items-center">
-                            Price
-                            <form method="get" action="/api/readP" style="display:inline;">
-                                <input type="hidden" name="sortField" value="price"/>
-                                <input type="hidden" name="sortDir" value="asc"/>
-                                <button type="button" class="btn btn-secondary btn-sm sort-button">
-                                  <i class="bi bi-sort-up-alt"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </th>
-                    <th>
-                        <div class="d-flex justify-content-between align-items-center">
-                            Stock Quantity
-                            <form method="get" action="/api/readP" style="display:inline;">
-                                <input type="hidden" name="sortField" value="stockQuantity"/>
+                            Amount
+                            <form method="get" action="/api/readS" style="display:inline;">
+                                <input type="hidden" name="sortField" value="amount"/>
                                 <input type="hidden" name="sortDir" value="asc"/>
                                 <button type="button" class="btn btn-secondary btn-sm sort-button">
                                   <i class="bi bi-sort-up-alt"></i>
@@ -215,29 +202,27 @@
                 </tr>
             </thead>
             <tbody>
-                <c:forEach var="prod" items="${products}" varStatus="status">
+                <c:forEach var="serv" items="${services}" varStatus="status">
                     <tr>
-                        <td><input type="checkbox" class="customer-checkbox" data-id="${prod.productId}"
-                            <c:if test="${prod.archived}">disabled</c:if> />
+                        <td><input type="checkbox" class="customer-checkbox" data-id="${serv.serviceId}"
+                            <c:if test="${serv.archived}">disabled</c:if> />
                         </td>
                         <td>${status.index + 1}</td>
-                        <td>${prod.name}</td>
-                        <td>${prod.description}</td>
-                        <td>${prod.price}</td>
-                        <td>${prod.stockQuantity}</td>
+                        <td>${serv.serviceName}</td>
+                        <td>${serv.amount}</td>
                         <td class="actions">
                             <!-- update button-->
                             <button type="button"
                                     class="btn btn-link p-0"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#productModal"
-                                    data-id="${prod.productId}"
+                                    data-bs-target="#serviceModal"
+                                    data-id="${serv.serviceId}"
                                     data-action="update">
                                 <i class="bi bi-pencil-square fs-3 text-dark"></i>
                             </button>
                             <!--archive button-->
-                            <button class="archive-btn" data-id="${prod.productId}" data-archived="${prod.archived}">
-                                <i class="bi ${prod.archived ? 'bi-box-arrow-up text-secondary fs-3 text-dark' : 'bi-archive fs-3 text-dark'}"></i>
+                            <button class="archive-btn" data-id="${serv.serviceId}" data-archived="${serv.archived}">
+                                <i class="bi ${serv.archived ? 'bi-box-arrow-up text-secondary fs-3 text-dark' : 'bi-archive fs-3 text-dark'}"></i>
                             </button>
                         </td>
                     </tr>
@@ -245,6 +230,7 @@
             </tbody>
         </table>
     </div>
+
 
     <!--checking toast message for redundant id-->
     <c:if test="${not empty toastMessage}">
@@ -261,30 +247,30 @@
     </c:if>
 
     <!-- Add and Update Products Modal -->
-    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="productModalTitle">Add Products</h5>
+            <h5 class="modal-title" id="serviceModalTitle">Add Services</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-            <jsp:include page="productForm.jsp"/>
+            <jsp:include page="serviceForm.jsp"/>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Toast for adding product -->
+    <!-- Toast for adding service -->
     <div id="addToast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
       <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-          <strong class="me-auto">Product System</strong>
+          <strong class="me-auto">Service System</strong>
           <small>Just now</small>
           <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body">
-          Product Added Successfully!
+          Service Added Successfully!
           <div class="progress mt-2" style="height: 5px;">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
           </div>
@@ -292,16 +278,16 @@
       </div>
     </div>
 
-    <!-- Toast for updating product -->
+    <!-- Toast for updating service -->
     <div id="updateToast" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
       <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-          <strong class="me-auto">Product System</strong>
+          <strong class="me-auto">Service System</strong>
           <small>Just now</small>
           <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
         </div>
         <div class="toast-body">
-          Product Updated Successfully!
+          Service Updated Successfully!
           <div class="progress mt-2" style="height: 5px;">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
           </div>
@@ -329,54 +315,52 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const productModal = document.getElementById('productModal');
-        const productForm = document.getElementById('productForm');
-        const modalTitle = document.getElementById('productModalTitle');
+        const serviceModal = document.getElementById('serviceModal');
+        const serviceForm = document.getElementById('serviceForm');
+        const modalTitle = document.getElementById('serviceModalTitle');
         const submitBtn = document.getElementById('formSubmitBtn');
 
-        productForm.addEventListener('submit', function () {
-            if (submitBtn.textContent === "Add Product") {
+        serviceForm.addEventListener('submit', function () {
+            if (submitBtn.textContent === "Add Service") {
                 localStorage.setItem("StatusAdd", "added");
-            } else if (submitBtn.textContent === "Update Product") {
+            } else if (submitBtn.textContent === "Update Service") {
                 localStorage.setItem("StatusUpdate", "updated");
             }
         });
 
-        productModal.addEventListener('show.bs.modal', function (event) {
+        serviceModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const action = button.getAttribute('data-action');
 
             if (action === 'add') {
-                modalTitle.textContent = 'Add Product';
-                productForm.action = '/api/createP';
-                submitBtn.textContent = 'Add Product';
+                modalTitle.textContent = 'Add Service';
+                serviceForm.action = '/api/createS';
+                submitBtn.textContent = 'Add Service';
 
                 // Clear fields
-                productForm.reset();
-                document.getElementById('productId').value = '';
+                serviceForm.reset();
+                document.getElementById('serviceId').value = '';
             } else if (action === 'update') {
-                modalTitle.textContent = 'Update Product';
-                productForm.action = '/api/updateP';
-                submitBtn.textContent = 'Update Product';
+                modalTitle.textContent = 'Update Service';
+                serviceForm.action = '/api/updateS';
+                submitBtn.textContent = 'Update Service';
 
-                const productId = button.getAttribute('data-id');
+                const serviceId = button.getAttribute('data-id');
 
-                // Fetch product data from server
-                  fetch('/api/product/' + productId)
+                // Fetch service data from server
+                  fetch('/api/service/' + serviceId)
                   .then(res => {
-                      if(!res.ok) throw new Error('Product not found');
+                      if(!res.ok) throw new Error('Service not found');
                       return res.json();
                   })
                   .then(data => {
-                      document.getElementById('productId').value = productId;
-                      document.getElementById('productName').value = data.name;
-                      document.getElementById('productDescription').value = data.description;
-                      document.getElementById('productPrice').value = data.price;
-                      document.getElementById('productStock').value = data.stockQuantity;
+                      document.getElementById('serviceId').value = serviceId;
+                      document.getElementById('serviceName').value = data.serviceName;
+                      document.getElementById('serviceAmount').value = data.amount;
                   })
                   .catch(err => {
                       console.error(err);
-                      alert('Failed to load customer data');
+                      alert('Failed to load service data');
                   });
             }
         });
@@ -399,7 +383,7 @@
                 return;
             }
 
-            fetch('/api/product/archive', {
+            fetch('/api/service/archive', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(selectedIds)
@@ -442,14 +426,14 @@
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
 
-                const customerId = Number(btn.getAttribute('data-id'));
+                const serviceId = Number(btn.getAttribute('data-id'));
                 const isArchived = btn.getAttribute('data-archived') === 'true';
-                const url = isArchived ? '/api/product/unarchive' : '/api/product/archive'; // full path
+                const url = isArchived ? '/api/service/unarchive' : '/api/service/archive'; // full path
 
                 fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify([customerId])
+                    body: JSON.stringify([serviceId])
                 })
                 .then(response => response.text())
                 .then(data => {
@@ -548,7 +532,7 @@
             localStorage.setItem("showArchived", showArchived);
 
             // reload with new param
-            window.location.href = "/api/readP?showArchived=" + showArchived;
+            window.location.href = "/api/readS?showArchived=" + showArchived;
         });
 
         //to change the state of archive icon above table
@@ -570,7 +554,7 @@
                 localStorage.setItem("archiveState", archiveState);
 
                 // send state via AJAX to backend
-                fetch("/api/product/archive/state", {
+                fetch("/api/service/archive/state", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ state: archiveState })

@@ -69,6 +69,10 @@ public class CustomerService {
         return customerRepository.existsByPhone(phone);
     }
 
+    public boolean existsById(Long Id) {
+        return customerRepository.existsById(Id);
+    }
+
     public boolean existsByEmail(String email) {
         return customerRepository.existsByEmail(email);
     }

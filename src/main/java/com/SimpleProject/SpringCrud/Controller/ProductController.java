@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/api")
@@ -27,21 +29,35 @@ public class ProductController {
                                 @RequestParam("description") String description,
                                 @RequestParam("price") double price,
                                 @RequestParam("stockQuantity") int stock_quantity,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
+        try {
+            ProductModel product = new ProductModel();
+            product.setName(name);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setStockQuantity(stock_quantity);
 
-        ProductModel product = new ProductModel();
-        product.setName(name);
-        product.setDescription(description);
-        product.setPrice(price);
-        product.setStockQuantity(stock_quantity);
+            productService.addProduct(product);
 
-        productService.addProduct(product);
+            redirectAttributes.addFlashAttribute("toastMessage", "Product created successfully!");
+            redirectAttributes.addFlashAttribute("toastType", "success");
 
-        redirectAttributes.addFlashAttribute("toastMessage", "Product created successfully!");
-        redirectAttributes.addFlashAttribute("toastType", "success");
+            return "redirect:/api/readP";
+        }
+        catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            // This catches database-level unique constraint violations
+            model.addAttribute("toastMessage", "ID or unique field already exists in the database!");
+            model.addAttribute("toastType", "danger");
 
-        return "redirect:/api/readP";
+            // Repopulate entered values
+            model.addAttribute("name", name);
+            model.addAttribute("description", description);
+            model.addAttribute("price", price);
+            model.addAttribute("stockQuantity", stock_quantity);
 
+            return "allProducts"; // stay on same page with toast
+        }
     }
 
     @GetMapping("/readP")
@@ -115,7 +131,7 @@ public class ProductController {
     @ResponseBody
     public ResponseEntity<String> unarchiveProducts(@RequestBody List<Long> productId) {
         productService.unarchiveProducts(productId);
-        return ResponseEntity.ok("Unarchived Successfully!");
+        return ResponseEntity.ok("Restored Successfully!");
     }
 
     @GetMapping("/product/search")
@@ -129,5 +145,24 @@ public class ProductController {
         model.addAttribute("sortDir", "asc");
 
         return "allProducts";
+    }
+
+    //getting product for update
+    @GetMapping("/product/{id}")
+    @ResponseBody
+    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+        ProductModel product = productService.getProductById(id);
+        if (product != null) {
+            ProductModel dto = new ProductModel();
+            dto.setName(product.getName());
+            dto.setDescription(product.getDescription());
+            dto.setPrice(product.getPrice());
+            dto.setStockQuantity(product.getStockQuantity());
+            return ResponseEntity.ok(dto);
+        } else {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Product not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
 }
